@@ -4,6 +4,7 @@ import com.georgeifrim.library.exception.BookNotFoundException;
 import com.georgeifrim.library.model.Book;
 import com.georgeifrim.library.repository.BookRepository;
 import com.georgeifrim.library.service.BookService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,19 @@ public class BookServiceImpl implements BookService {
     public BookServiceImpl(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
-
     @Override
     public Book saveBook(Book book) {
+        long count = bookRepository.countBooksByAuthorAndTitle(book.getAuthor(), book.getTitle());
+        if(count != 0){
+            throw new BookNotFoundException("Cartea deja exista !");
+        }
         return bookRepository.save(book);
+
     }
 
     @Override
     public Book findById(Long id) {
-        return bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        return bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     }
 
     @Override
@@ -45,6 +50,21 @@ public class BookServiceImpl implements BookService {
         if (bookRepository.existsById(book.getId())) {
             return saveBook(book);
         }
-        throw new BookNotFoundException();
+        throw new BookNotFoundException(book.getId());
+    }
+
+    @Override
+    public void deleteBook(Long id) {
+
+    }
+
+    @Override
+    public Book patchAuthor(Long id, String author) {
+        return null;
+    }
+
+    @Override
+    public Book patchTitle(Long id, String title) {
+        return null;
     }
 }
