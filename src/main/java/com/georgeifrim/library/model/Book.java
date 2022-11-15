@@ -10,6 +10,7 @@ import javax.persistence.Id;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Book {
 
     @Id

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -49,22 +50,43 @@ public class BookServiceImpl implements BookService {
     public Book updateBook(Book book) {
         if (bookRepository.existsById(book.getId())) {
             return saveBook(book);
+        }else{
+            throw new BookNotFoundException(book.getId());
         }
-        throw new BookNotFoundException(book.getId());
     }
 
     @Override
     public void deleteBook(Long id) {
+        if(bookRepository.existsById(id)){
+            bookRepository.deleteById(id);
+        }else{
+            throw new BookNotFoundException(id);
+        }
 
     }
 
     @Override
     public Book patchAuthor(Long id, String author) {
-        return null;
-    }
+        Optional<Book> existingBook = bookRepository.findById(id);
 
+        if(existingBook.isEmpty()){
+            throw new BookNotFoundException(id);
+        }else{
+            Book returnedBook = existingBook.get();
+            returnedBook.setAuthor(author);
+            return returnedBook;
+        }
+    }
     @Override
     public Book patchTitle(Long id, String title) {
-        return null;
+        Optional<Book> existingBook = bookRepository.findById(id);
+
+        if(existingBook.isEmpty()){
+            throw new BookNotFoundException(id);
+        }else{
+            Book returnedBook = existingBook.get();
+            returnedBook.setTitle(title);
+            return returnedBook;
+        }
     }
 }
